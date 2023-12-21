@@ -8,8 +8,8 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async uploadImageToCloudinary(file: Express.Multer.File) {
-    return await this.cloudinary.uploadImage(file).catch(() => {
+  async uploadImageToCloudinary(file: Express.Multer.File, photo: string) {
+    return await this.cloudinary.uploadImage(file, photo).catch(() => {
       throw new BadRequestException('Invalid file type.');
     });
   }

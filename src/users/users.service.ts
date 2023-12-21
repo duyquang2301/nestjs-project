@@ -4,12 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private cloudinary: CloudinaryService,
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -30,5 +32,14 @@ export class UsersService {
 
   async remove(id: number): Promise<void> {
     await this.usersRepository.delete(id);
+  }
+
+  async uploadImageProfile(id: number, file: Express.Multer.File) {
+    const folder = `profile/${id}`;
+    const result = await this.cloudinary.uploadImage(file, folder);
+    const user = await this.usersRepository.findOneBy({ id });
+    user.photo = result.url;
+    await this.usersRepository.save(user);
+    return user;
   }
 }

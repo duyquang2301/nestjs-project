@@ -6,15 +6,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CloudinaryService } from './cloudinary/cloudinary.service';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get()
   getHello(): string {
@@ -24,6 +20,7 @@ export class AppController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.appService.uploadImageToCloudinary(file);
+    const upload = this.appService.uploadImageToCloudinary(file, 'photo');
+    return upload;
   }
 }
