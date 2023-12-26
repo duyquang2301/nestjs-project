@@ -14,8 +14,9 @@ export class UsersService {
     private cloudinary: CloudinaryService,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  createUser(createUserDto: Partial<User>): Promise<User> {
+    const newuser = this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(newuser);
   }
 
   findAll(): Promise<User[]> {

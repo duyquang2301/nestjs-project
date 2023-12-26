@@ -13,19 +13,34 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from './entities/user.entity';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private mailService: MailerService,
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    await this.mailService.sendMail({
+      to: createUserDto.email,
+      subject: 'wellcome',
+      template: './wellcome',
+      context: {
+        name: createUserDto.firstName,
+      },
+    });
+    return this.usersService.createUser(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const user = await this.usersService.findAll();
+
+    return user;
   }
 
   @Get(':id')
